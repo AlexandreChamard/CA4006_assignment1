@@ -1,28 +1,36 @@
 
 package factory;
 
-import java.util.Vector;
+import java.lang.InternalError;
 
+import factory.Factory;
+import factory.Pipeline;
 import factory.Aircraft;
-
-class Task {
-    public String aircraftId;
-    public int nParts;
-}
+import factory.State;
 
 public class Robot {
-    private Vector<Task> works;
-    private String partId; // set dans takePart, utilisé dans usePart
-    private String status; // surement enum mais pas encore défini
+    private Factory factory;
+    private Pipeline pipeline;
+    private String aircraftId;
+    private int nParts;
+    private State state;
 
-    /** vérifier le status & l'Id + sleep + set partId + print message */
-    public void takePart() {
-
+    public Robot(Factory factory) {
+        this.factory = factory;
+        this.state = State.PENDING;
     }
 
     /** le status + sleep + print message */
-    public void goToPipeline(int pipelineId) {
+    public void goToPipeline(Pipeline pipeline) {
+        if (this.pipeline != null) {
+            throw new InternalError("Robot: already working in a pipeline.");
+        }
+        this.pipeline = pipeline;
+    }
 
+    /** vérifier le status & l'Id + sleep + set partId + print message */
+    public void takePart() {
+        factory.getStorage().getPart(this);
     }
 
     /** vérifier le status + vérifié l'Id + sleep + set addPart sur l'aircraft + decrementer le works + print message */
@@ -40,14 +48,9 @@ public class Robot {
 
     }
 
-    /** enleve la ligne (utilisé si bug) */
-    public void resetWork(Aircraft aircraft) {
-
-    }
-
     /** retourne le total du travail à faire (utilisé pour balanced le travail entre les robots) */
     public int workToDo() {
-        return 0;
+        return nParts;
     }
 
     /** manage la variable works:

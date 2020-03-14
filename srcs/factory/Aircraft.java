@@ -1,6 +1,8 @@
 
 package factory;
 
+import java.lang.InternalError;
+
 public class Aircraft {
     private String id;
     private int size;
@@ -11,14 +13,19 @@ public class Aircraft {
         this.size = size;
     }
 
-    /** pas besoin d'être syncronized car il est construit pièce par pièce dans la pipeline */
-    public void addPart() {
-        /** vérifier le nombre */
+    public synchronized void addPart() {
+        if (size == nbPart) {
+            throw new InternalError("aircraft "+id+" is already build.");
+        }
         ++nbPart;
     }
 
-    public boolean Built() {
+    public synchronized boolean isBuilt() {
         return size == nbPart;
+    }
+
+    public synchronized int missingWork() {
+        return size - nbPart;
     }
 
     public String getId() {

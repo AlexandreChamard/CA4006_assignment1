@@ -1,0 +1,5 @@
+buy 100
+command Bla 42
+sleep 3
+buy 10
+command A 10
