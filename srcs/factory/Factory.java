@@ -66,6 +66,9 @@ public class Factory {
                 for (Robot r : robots) {
                     if (r.inPipeline() == false) {
                         v.add(r);
+                        if (v.size() == n) {
+                            break;
+                        }
                     }
                 }
                 if (v.isEmpty() == false) {
