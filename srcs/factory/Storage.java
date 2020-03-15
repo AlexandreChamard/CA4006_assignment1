@@ -22,10 +22,16 @@ public class Storage {
         notify();
     }
 
-    public synchronized void getPart(Robot robot) {
-        while (parts == 0) {
-            try { wait(); } catch (InterruptedException e) {}
-        }
-        --parts;
+    public void getPart(Robot robot) {
+        factory.execute(() -> {
+            synchronized (this) {
+                System.out.println("Thread "+Thread.currentThread().getId()+": "+robot+" arrives on storage.");
+                while (parts == 0) {
+                    try { wait(); } catch (InterruptedException e) {} //!!\ bloquant
+                }
+                --parts;
+            }
+            robot.hasPart();
+        });
     }
 }

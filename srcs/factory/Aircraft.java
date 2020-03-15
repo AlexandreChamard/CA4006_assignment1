@@ -34,6 +34,6 @@ public class Aircraft {
 
     /** stringification */
     public String toString() {
-        return "TODO";
+        return "Aircraft "+id;
     }
 }

@@ -1,0 +1,3 @@
+buy 100
+command A 10
+command B 90
