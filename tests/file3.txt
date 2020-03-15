@@ -1,0 +1,41 @@
+
+buy 1
+
+command A 100
+
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8
+sleep 100
+buy 8

@@ -108,6 +108,9 @@ public class Robot {
 
     /** ajoute du travail au robot */
     public synchronized void manageWork(int n) {
+        if (n == 0) {
+            throw new InternalError("Robot cannot do no job when invoked.");
+        }
         nParts = Math.max(nParts + n, 0);
         if (holding == true) {
             nParts = 1;
