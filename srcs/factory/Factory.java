@@ -17,7 +17,7 @@ public class Factory {
     public static final int  TICK_FREQUENCE = 10; // 0.1 sec
     private static final int NB_ROBOTS = 10;
     private static final int NB_PIPELINES = 1;
-    private static final int NB_THREADS = NB_PIPELINES + 2; // NB_PIPELINES + Storage thread + 1 (because wait block)
+    private static final int NB_THREADS = NB_PIPELINES + 1; // NB_PIPELINES + 1 (because wait block)
 
     private static ExecutorService  threadPool = Executors.newFixedThreadPool(NB_THREADS);
     private Queue<Aircraft>         aircrafts;
