@@ -7,6 +7,7 @@ import java.util.Queue;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors; 
+import java.util.concurrent.locks.*;
 
 import factory.Pipeline;
 import factory.Robot;
@@ -14,12 +15,13 @@ import factory.Storage;
 import factory.Aircraft;
 
 public class Factory {
-    public static final int  TICK_FREQUENCE = 10; // 0.1 sec
+    public static final int  TICK_FREQUENCE = 10; // 0.01 sec
     private static final int NB_ROBOTS = 10;
-    private static final int NB_PIPELINES = 1;
-    private static final int NB_THREADS = 1; // NB_PIPELINES + 1 (because wait block)
+    private static final int NB_PIPELINES = 2;
+    private static final int NB_THREADS = 1;
 
     private static ExecutorService  threadPool = Executors.newFixedThreadPool(NB_THREADS);
+    private Lock                    lock = new ReentrantLock();
     private Queue<Aircraft>         aircrafts;
     private Pipeline[]              pipelines;
     private Robot[]                 robots;
@@ -61,28 +63,31 @@ public class Factory {
     // async
     public void givesRobots(Pipeline p, int n) {
         execute(() -> {
-            synchronized (this) {
-                Vector<Robot> v = new Vector<Robot>();
-                for (Robot r : robots) {
-                    if (r.inPipeline() == false) {
-                        v.add(r);
-                        if (v.size() == n) {
-                            break;
-                        }
+            int max_robots = Math.min(n, Math.max(robots.length / pipelines.length, 3));
+            Vector<Robot> v = new Vector<Robot>();
+            lock.lock();
+            for (Robot r : robots) {
+                if (r.inPipeline() == false) {
+                    System.out.println("add "+r+" to the "+p);
+                    v.add(r);
+                    r.goToPipeline(p);
+                    if (v.size() == max_robots) {
+                        break;
                     }
                 }
-                if (v.isEmpty() == false) {
-                    p.getRobots(v);
-                } else {
-                    // pas de chance
-                    p.getRobots(null); // to not block
-                }
+            }
+            lock.unlock();
+            if (v.isEmpty() == false) {
+                p.getRobots(v);
+            } else {
+                // pas de chance
+                p.getRobots(null); // to not block
             }
         });
     }
 
     public synchronized void pipelineEnd(Pipeline pipeline, Aircraft aircraft) {
-        System.out.println(aircraft+" has exist the factory to fly away.");
+        System.out.println(aircraft+" has left the factory to fly away.");
         if (aircrafts.peek() != null) {
             pipeline.buildAircraft(aircrafts.poll());
         } else {
@@ -156,12 +161,6 @@ public class Factory {
             }
             System.out.println(p+" has been closed.");
         }
-        for (Robot r : robots) {
-            while (r.inPipeline()) {
-                try { wait(); } catch (InterruptedException e) {}
-            }
-
-        }
         System.out.println("Factory has been closed.");
         threadPool.shutdown();
     }
@@ -169,12 +168,21 @@ public class Factory {
     private synchronized void newCommand(String name, int nParts) {
         Aircraft aircraft = new Aircraft(name, nParts);
         System.out.println("new command for '"+name+"' with "+nParts+" part"+(nParts > 1 ? "s":"")+".");
-        for (Pipeline p : pipelines) {
-            if (p.working() == false) {
-                p.buildAircraft(aircraft);
-                return;
+
+        // find if at least one robot is available
+        for (Robot r : robots) {
+            if (r.inPipeline() == false) {
+                // find an available pipeline
+                for (Pipeline p : pipelines) {
+                    if (p.working() == false) {
+                        p.buildAircraft(aircraft);
+                        return;
+                    }
+                }
+                break;
             }
         }
+        // if neither a robot nor a pipeline is available, put the command in the waiting list
         aircrafts.add(aircraft);
     }
 }

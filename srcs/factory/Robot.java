@@ -35,15 +35,13 @@ public class Robot {
     }
 
     /** le status + sleep + print message */
-    public synchronized void goToPipeline(Pipeline pipeline, int n) {
-        if (this.pipeline != null) {
-            throw new InternalError("Robot: already working in a pipeline.");
+    public synchronized void goToPipeline(Pipeline pipeline) {
+        if (inPipeline() == true) {
+            throw new InternalError(this+": already working in a pipeline.");
         }
         this.pipeline = pipeline;
-        manageWork(n);
         state = State.ACTIVE;
         // print work on pipeline
-        takePart();
     }
 
     public synchronized boolean working() {
@@ -54,12 +52,20 @@ public class Robot {
         return state != State.PENDING;
     }
 
+    public synchronized void startWork(int n) {
+        if (inPipeline() == false) {
+            throw new InternalError(this+" is not assigned to any pipeline.");
+        }
+        takePart();
+        manageWork(n);
+    }
+
     // async
     public synchronized void takePart() {
         changeState(State.ACTIVE, State.STORAGE, "takePart");
         factory.execute(() -> {
             if (state != State.STORAGE) {
-                throw new InternalError("Robot: Invalid state on takePart.");
+                throw new InternalError(this+": Invalid state on takePart.");
             }
             System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" goes to storage.");
             try { Thread.sleep(2 * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
@@ -109,7 +115,7 @@ public class Robot {
     /** ajoute du travail au robot */
     public synchronized void manageWork(int n) {
         if (n == 0) {
-            throw new InternalError("Robot cannot do no job when invoked.");
+            throw new InternalError(this+" cannot do no job when invoked.");
         }
         nParts = Math.max(nParts + n, 0);
         if (holding == true) {
@@ -135,7 +141,7 @@ public class Robot {
 
     private synchronized void changeState(State from, State to, String msg) {
         if (state != from) {
-            throw new InternalError("Robot: Invalid state on "+msg+": should be "+from+" but was "+to+".");
+            throw new InternalError(this+": Invalid state on "+msg+": should be "+from+" but was "+to+".");
         }
         state = to;
     }

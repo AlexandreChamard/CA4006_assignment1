@@ -31,7 +31,7 @@ public class Pipeline {
 
     public void buildAircraft(Aircraft aircraft) {
         if (this.aircraft != null) {
-            throw new InternalError("Pipeline: there is already an aircraft to build.");
+            throw new InternalError(this+": there is already an aircraft to build.");
         }
         this.aircraft = aircraft;
         factory.givesRobots(this, aircraft.missingWork());
@@ -53,7 +53,7 @@ public class Pipeline {
 
                 int n = aircraft.missingWork() / v.size();
                 for (Robot r : v) {
-                    r.goToPipeline(this, n);
+                    r.startWork(n);
                 }
                 if (aircraft.missingWork() - n * v.size() != 0) {
                     v.firstElement().manageWork(aircraft.missingWork() - n * v.size());
@@ -67,7 +67,7 @@ public class Pipeline {
         factory.execute(() -> {
             synchronized (this) {
                 if (r != queue.peek()) {
-                    throw new InternalError("Pipeline: advance command was sent from the corrupted "+r+".");
+                    throw new InternalError(this+": advance command was sent from the corrupted "+r+".");
                 }
                 queue.remove();
                 if (aircraft.isBuilt() == false) {
@@ -90,10 +90,10 @@ public class Pipeline {
         factory.execute(() -> {
             synchronized (this) {
                 if (robots.contains(r) == false) {
-                    throw new InternalError("Pipeline: place command was sent from the corrupted "+r+".");
+                    throw new InternalError(this+": place command was sent from the corrupted "+r+".");
                 }
                 if (queue.contains(r) == true) {
-                    throw new InternalError("Pipeline: the robot "+r+" is already in the queue.");
+                    throw new InternalError(this+": the robot "+r+" is already in the queue.");
                 }
             }
 
@@ -114,7 +114,7 @@ public class Pipeline {
         factory.execute(() -> {
             synchronized (this) {
                 if (robots.remove(r) == false) {
-                    throw new InternalError("Pipeline: endOfWork command was sent from the corrupted "+r+".");
+                    throw new InternalError(this+": endOfWork command was sent from the corrupted "+r+".");
                 }
                 notify();
                 System.out.println("Thread "+Thread.currentThread().getId()+": "+r+" has left the "+this);

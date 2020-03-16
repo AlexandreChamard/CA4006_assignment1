@@ -1,0 +1,6 @@
+
+buy 100
+
+command A 25
+command B 50
+command C 25
