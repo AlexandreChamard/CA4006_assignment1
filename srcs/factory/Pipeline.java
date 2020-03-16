@@ -76,7 +76,7 @@ public class Pipeline {
                     }
                     System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" advance the aircraft ("+aircraft.missingWork()+" parts left).");
 
-                    try { Thread.sleep(1 * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
+                    try { Thread.sleep(1 * factory.getFrequence()); } catch (InterruptedException e) {}
 
                 } else {
                     endPipeline();
@@ -98,7 +98,7 @@ public class Pipeline {
             }
 
             System.out.println("Thread "+Thread.currentThread().getId()+": "+r+" goes to "+this+".");
-            try { Thread.sleep(4 * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
+            try { Thread.sleep(4 * factory.getFrequence()); } catch (InterruptedException e) {}
 
             synchronized (this) {
                 queue.add(r);

@@ -15,31 +15,48 @@ import factory.Storage;
 import factory.Aircraft;
 
 public class Factory {
-    public static final int  TICK_FREQUENCE = 10; // 0.01 sec
-    private static final int NB_ROBOTS = 10;
-    private static final int NB_PIPELINES = 2;
-    private static final int NB_THREADS = 1;
+    public static final int DEFAULT_TICK_FREQUENCE = 100; // 0.1 sec
+    public static final int DEFAULT_NB_THREADS = 2;
+    public static final int DEFAULT_NB_PIPELINES = 1;
+    public static final int DEFAULT_NB_ROBOTS = 10;
 
-    private static ExecutorService  threadPool = Executors.newFixedThreadPool(NB_THREADS);
-    private Lock                    lock = new ReentrantLock();
+    private static int              tickFrequence;
+    private static ExecutorService  threadPool;
+
+    private Lock                    lock = new ReentrantLock(); // use to lock when robots are sent to pipelines
     private Queue<Aircraft>         aircrafts;
     private Pipeline[]              pipelines;
     private Robot[]                 robots;
     private Storage                 storage;
     private int                     linesRead = 0;
 
-    public Factory() {
+    public Factory(int tickFrequence, int nbThreads, int nbPipelines, int nbRobots) {
+        if (tickFrequence <= 0 || nbThreads <= 0 || nbPipelines <= 0 || nbRobots <= 0) {
+            throw new InternalError("Factory creation: invalid arguments.");
+        }
+        setFrequence(tickFrequence);
+        if (threadPool == null) {
+            threadPool = Executors.newFixedThreadPool(nbThreads);
+        }
         aircrafts = new ArrayDeque<Aircraft>();
-        pipelines = new Pipeline[NB_PIPELINES];
-        robots = new Robot[NB_ROBOTS];
+        pipelines = new Pipeline[nbPipelines];
+        robots = new Robot[nbRobots];
         storage = new Storage(this);
     }
 
+    public void setFrequence(int tickFrequence) {
+        this.tickFrequence = tickFrequence;
+    }
+
+    public int getFrequence() {
+        return tickFrequence;
+    }
+
     public void start() {
-        for (int i = 0; i < NB_PIPELINES; ++i) {
+        for (int i = 0; i < pipelines.length; ++i) {
             pipelines[i] = new Pipeline(this);
         }
-        for (int i = 0; i < NB_ROBOTS; ++i) {
+        for (int i = 0; i < robots.length; ++i) {
             robots[i] = new Robot(this);
         }
 
@@ -103,13 +120,14 @@ public class Factory {
         if (line == null) return;
         ++linesRead;
 
+        line = line.trim();
         if (line.startsWith("sleep ")) { // sleep N
 
             try {
                 int n = Integer.parseInt(line.substring(6).trim());
                 if (n > 0) {
                     System.out.println("start sleep");
-                    try { Thread.sleep(n*TICK_FREQUENCE); } catch (InterruptedException e) {}
+                    try { Thread.sleep(n*getFrequence()); } catch (InterruptedException e) {}
                     System.out.println("wake up");
                 } else {
                     System.out.println("error parse ligne "+linesRead+": `sleep' command takes a non-zero positive integer as argument.");
@@ -148,6 +166,19 @@ public class Factory {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("error parse ligne "+linesRead+": `buy' command takes a non-zero positive integer as argument.");
+            }
+
+        } else if (line.startsWith("frequence ")) {
+
+            try {
+                int n = Integer.parseInt(line.substring(10).trim());
+                if (n > 0) {
+                    setFrequence(n);
+                } else {
+                    System.out.println("error parse ligne "+linesRead+": `frequence' command takes a non-zero positive integer as argument.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("error parse ligne "+linesRead+": `frequence' command takes a non-zero positive integer as argument.");
             }
 
         }

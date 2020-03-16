@@ -68,7 +68,7 @@ public class Robot {
                 throw new InternalError(this+": Invalid state on takePart.");
             }
             System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" goes to storage.");
-            try { Thread.sleep(2 * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
+            try { Thread.sleep(2 * factory.getFrequence()); } catch (InterruptedException e) {}
             factory.getStorage().getPart(this);
         });
     }
@@ -96,7 +96,7 @@ public class Robot {
             }
             System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" works on "+pipeline+".");
             int n = r.nextInt(9)+2; // [2-10]
-            try { Thread.sleep(n * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
+            try { Thread.sleep(n * factory.getFrequence()); } catch (InterruptedException e) {}
             aircraft.addPart();
             synchronized (this) {
                 holding = false;
