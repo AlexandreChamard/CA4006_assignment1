@@ -58,35 +58,24 @@ public class Pipeline {
                 if (aircraft.missingWork() - n * v.size() != 0) {
                     v.firstElement().manageWork(aircraft.missingWork() - n * v.size());
                 }
-                factory.execute(() -> {
-                    synchronized (this) {
-                        Robot next_robot;
-                        while ((next_robot = queue.peek()) == null) {
-                            try { wait(); } catch (InterruptedException e) {} //!!\ bloquant
-                        }
-                        next_robot.usePart(aircraft);
-                    }
-                });
             }
         });
     }
 
     // async
-    public synchronized void advanceAircraft(Robot r) {
-        if (r != queue.peek()) {
-            throw new InternalError("Pipeline: advance command was sent from the corrupted "+r+".");
-        }
-        queue.remove();
+    public void advanceAircraft(Robot r) {
         factory.execute(() -> {
             synchronized (this) {
+                if (r != queue.peek()) {
+                    throw new InternalError("Pipeline: advance command was sent from the corrupted "+r+".");
+                }
+                queue.remove();
                 if (aircraft.isBuilt() == false) {
-                    Robot next_robot;
-                    while ((next_robot = queue.peek()) == null) {
-                        try { wait(); } catch (InterruptedException e) {} //!!\ bloquant
+                    if (queue.isEmpty() == false) {
+                        queue.peek().usePart(aircraft);
                     }
-                    next_robot.usePart(aircraft);
+                    System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" advance the aircraft ("+aircraft.missingWork()+" parts left).");
 
-                    System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" advance the aircraft.");
                     try { Thread.sleep(1 * factory.TICK_FREQUENCE); } catch (InterruptedException e) {}
 
                 } else {
@@ -113,7 +102,9 @@ public class Pipeline {
 
             synchronized (this) {
                 queue.add(r);
-                notify();
+                if (queue.size() == 1) {
+                    r.usePart(aircraft);
+                }
             }
         });
     }
