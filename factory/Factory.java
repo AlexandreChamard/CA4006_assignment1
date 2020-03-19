@@ -200,6 +200,8 @@ public class Factory {
         if (_running == true)
             System.out.println("Start closing the factory.");
         _running = false;
+        if (aircrafts.isEmpty() == false)
+            return;
         for (Pipeline p : pipelines) {
             if (p.working() == true) {
                 return;
