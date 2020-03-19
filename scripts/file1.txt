@@ -1,0 +1,14 @@
+// comment is every line that does not egin with a command.
+
+buy 30
+command A 12
+command B 28
+// does not have enough parts to build both command
+
+sleep 300
+// wait for restock
+
+buy 20
+
+command C 10
+

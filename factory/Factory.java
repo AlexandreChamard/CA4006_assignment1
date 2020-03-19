@@ -23,6 +23,7 @@ public class Factory {
     private static int              tickFrequence;
     private static ExecutorService  threadPool;
 
+    private boolean                 _running;
     private Lock                    lock = new ReentrantLock(); // use to lock when robots are sent to pipelines
     private Queue<Aircraft>         aircrafts;
     private Pipeline[]              pipelines;
@@ -52,7 +53,12 @@ public class Factory {
         return tickFrequence;
     }
 
+    public boolean running() {
+        return _running;
+    }
+
     public void start() {
+        _running = true;
         for (int i = 0; i < pipelines.length; ++i) {
             pipelines[i] = new Pipeline(this);
         }
@@ -185,6 +191,7 @@ public class Factory {
     }
 
     private synchronized void closeFactory() {
+        _running = false;
         System.out.println("Start closing the factory.");
         for (Pipeline p : pipelines) {
             while (p.working()) {

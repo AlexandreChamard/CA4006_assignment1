@@ -32,7 +32,11 @@ public class Storage {
             // System.out.println("Thread "+Thread.currentThread().getId()+": "+robot+" arrives on storage.");
             synchronized (this) {
                 if (parts == 0) {
-                    System.out.println("Thread "+Thread.currentThread().getId()+": "+robot+" storage is empty. Wait for new pieces");
+                    System.out.println("Thread "+Thread.currentThread().getId()+": "+robot+" storage is empty. Wait for new pieces...");
+                    if (factory.running() == false) {
+                        System.out.println("Thread "+Thread.currentThread().getId()+": Due to covid-19, no new piece will arrive. The factory is forced to close.");
+                        System.exit(42);
+                    }
                     waitingList.add(robot);
                 } else {
                     --parts;

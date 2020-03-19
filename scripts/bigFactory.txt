@@ -1,0 +1,60 @@
+buy 1000
+command a0 20
+command a1 20
+command a2 20
+command a3 20
+command a4 20
+
+command a5 20
+command a6 20
+command a7 20
+command a8 20
+command a9 20
+
+command a10 20
+command a11 20
+command a12 20
+command a13 20
+command a14 20
+
+command a15 20
+command a16 20
+command a17 20
+command a18 20
+command a19 20
+
+command a20 20
+command a21 20
+command a22 20
+command a23 20
+command a24 20
+
+command a25 20
+command a26 20
+command a27 20
+command a28 20
+command a29 20
+
+command a30 20
+command a31 20
+command a32 20
+command a33 20
+command a34 20
+
+command a35 20
+command a36 20
+command a37 20
+command a38 20
+command a39 20
+
+command a40 20
+command a41 20
+command a42 20
+command a43 20
+command a44 20
+
+command a45 20
+command a46 20
+command a47 20
+command a48 20
+command a49 20

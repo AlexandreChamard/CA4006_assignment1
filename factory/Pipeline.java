@@ -46,7 +46,7 @@ public class Pipeline {
                     aircraft = null;
                     return;
                 }
-                this.robots.addAll(v);
+                robots.addAll(v);
                 System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" has get "+v.size()+" new robots.");
 
                 //!!\ algo ne marche que si pas déjà de travail assigné
