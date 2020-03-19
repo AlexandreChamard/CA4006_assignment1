@@ -25,11 +25,11 @@ public class Pipeline {
         System.out.println(this+" has been created.");
     }
 
-    public boolean working() {
+    public synchronized boolean working() {
         return aircraft != null || robots.isEmpty() == false;
     }
 
-    public void buildAircraft(Aircraft aircraft) {
+    public synchronized void buildAircraft(Aircraft aircraft) {
         if (this.aircraft != null) {
             throw new InternalError(this+": there is already an aircraft to build.");
         }
@@ -50,7 +50,6 @@ public class Pipeline {
                 System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" has get "+v.size()+" new robots.");
 
                 //!!\ algo ne marche que si pas déjà de travail assigné
-
                 int n = aircraft.missingWork() / v.size();
                 for (Robot r : v) {
                     r.startWork(n);

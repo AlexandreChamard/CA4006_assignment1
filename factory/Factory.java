@@ -45,15 +45,15 @@ public class Factory {
         storage = new Storage(this);
     }
 
-    public void setFrequence(int tickFrequence) {
+    public synchronized void setFrequence(int tickFrequence) {
         this.tickFrequence = tickFrequence;
     }
 
-    public int getFrequence() {
+    public synchronized int getFrequence() {
         return tickFrequence;
     }
 
-    public boolean running() {
+    public synchronized boolean running() {
         return _running;
     }
 
@@ -79,7 +79,7 @@ public class Factory {
         closeFactory();
     }
 
-    public synchronized void execute(Runnable r) {
+    public void execute(Runnable r) {
         threadPool.execute(r);
     }
 
@@ -103,19 +103,25 @@ public class Factory {
             if (v.isEmpty() == false) {
                 p.getRobots(v);
             } else {
-                // pas de chance
+                // unlucky
                 p.getRobots(null); // to not block
             }
         });
     }
 
-    public synchronized void pipelineEnd(Pipeline pipeline, Aircraft aircraft) {
-        System.out.println(aircraft+" has left the factory to fly away.");
-        if (aircrafts.peek() != null) {
-            pipeline.buildAircraft(aircrafts.poll());
-        } else {
-            notify();
-        }
+    public void pipelineEnd(Pipeline pipeline, Aircraft aircraft) {
+        execute(() -> {
+            synchronized (this) {
+                System.out.println(aircraft+" has left the factory to fly away.");
+                if (aircrafts.peek() != null) {
+                    pipeline.buildAircraft(aircrafts.poll());
+                } else {
+                    if (_running == false) {
+                        closeFactory();
+                    }
+                }
+            }
+        });
     }
 
     public Storage getStorage() {
@@ -191,11 +197,12 @@ public class Factory {
     }
 
     private synchronized void closeFactory() {
+        if (_running == true)
+            System.out.println("Start closing the factory.");
         _running = false;
-        System.out.println("Start closing the factory.");
         for (Pipeline p : pipelines) {
-            while (p.working()) {
-                try { wait(); } catch (InterruptedException e) {}
+            if (p.working() == true) {
+                return;
             }
             System.out.println(p+" has been closed.");
         }

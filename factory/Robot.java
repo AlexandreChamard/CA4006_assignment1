@@ -13,7 +13,6 @@ enum State {
     ACTIVE,
     WORKING,
     STORAGE,
-
 }
 
 public class Robot {
@@ -36,7 +35,7 @@ public class Robot {
 
     /** le status + sleep + print message */
     public synchronized void goToPipeline(Pipeline pipeline) {
-        if (inPipeline() == true) {
+        if (state != State.PENDING) {
             throw new InternalError(this+": already working in a pipeline.");
         }
         this.pipeline = pipeline;
@@ -53,7 +52,7 @@ public class Robot {
     }
 
     public synchronized void startWork(int n) {
-        if (inPipeline() == false) {
+        if (state == State.PENDING) {
             throw new InternalError(this+" is not assigned to any pipeline.");
         }
         takePart();
@@ -61,7 +60,7 @@ public class Robot {
     }
 
     // async
-    public synchronized void takePart() {
+    public void takePart() {
         changeState(State.ACTIVE, State.STORAGE, "takePart");
         factory.execute(() -> {
             if (state != State.STORAGE) {
