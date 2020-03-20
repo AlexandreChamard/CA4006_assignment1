@@ -33,6 +33,8 @@ public class Pipeline {
         if (this.aircraft != null) {
             throw new InternalError(this+": there is already an aircraft to build.");
         }
+        if (factory.redirected()) System.out.println("[8,'"+aircraft+"','"+this+"']");
+        System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" starts to build "+aircraft);
         this.aircraft = aircraft;
         factory.givesRobots(this, aircraft.missingWork());
     }
@@ -73,6 +75,7 @@ public class Pipeline {
                     if (queue.isEmpty() == false) {
                         queue.peek().usePart(aircraft);
                     }
+                    if (factory.redirected()) System.out.println("[7,'"+this+"',1]");
                     System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" advance the aircraft ("+aircraft.missingWork()+" parts left).");
 
                     try { Thread.sleep(1 * factory.getFrequence()); } catch (InterruptedException e) {}
@@ -96,6 +99,7 @@ public class Pipeline {
                 }
             }
 
+            if (factory.redirected()) System.out.println("[6,'"+r+"',3]");
             System.out.println("Thread "+Thread.currentThread().getId()+": "+r+" goes to "+this+".");
             try { Thread.sleep(4 * factory.getFrequence()); } catch (InterruptedException e) {}
 
@@ -128,6 +132,7 @@ public class Pipeline {
     private void endPipeline() {
         factory.execute(() -> {
             synchronized (this) {
+                if (factory.redirected()) System.out.println("[7,'"+this+"',2]");
                 System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" has successfully build "+aircraft);
                 for (Robot robot : robots) {
                     if (robot.workToDo() > 0) {

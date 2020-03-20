@@ -6,7 +6,7 @@ class Main {
     public static void help() {
         System.out.println("");
         System.out.println("USAGE:");
-        System.out.println("\tjava Main [-f n] [-t n] [-p n] [-r n]");
+        System.out.println("\tjava Main [-f n] [-t n] [-p n] [-r n] [--redirected]");
         System.out.println("");
         System.out.println("-f --frequence: set the tick frequence (in ms) (n > 0).");
         System.out.println("-t --threads  : set the number of threads (n > 0).");
@@ -19,11 +19,13 @@ class Main {
         System.out.println("command Id n: command an aircraft to the factory (Id is a string) (n > 0).");
         System.out.println("sleep n     : sleep n ticks (n > 0) (useful for scripting).");
         System.out.println("frequence n : modify the ticks frequence (n > 0).");
+        System.out.println("redirected  : print information for the graphical extension.");
         System.out.println("");
         System.exit(0);
     }
 
-    public static void parseArgs(String[] args, int[] values) {
+    public static boolean parseArgs(String[] args, int[] values) {
+        boolean redirected = false;
         int n = -1;
         for (String a : args) {
             if (n != -1) {
@@ -55,6 +57,9 @@ class Main {
                     case "-r": case "--robots":
                         n = 3;
                         break;
+                    case "--redirected":
+                        redirected = true;
+                        break;
                     default:
                         System.out.println("Invalid argument "+a);
                 }
@@ -63,6 +68,7 @@ class Main {
         if (n != -1) {
             System.out.println("Missing number argument to "+args[args.length-1]+". Default value was taken.");
         }
+        return redirected;
     }
 
     public static void main(String[] args) {
@@ -71,12 +77,13 @@ class Main {
                         Factory.DEFAULT_NB_PIPELINES,
                         Factory.DEFAULT_NB_ROBOTS};
 
-        parseArgs(args, values);
+        boolean redirected = parseArgs(args, values);
+        if (redirected) System.out.println("[0,"+values[0]+","+values[1]+","+values[2]+","+values[3]+"]");
         System.out.println("Tick Frequence: "+values[0]);
         System.out.println("Nb Threads:     "+values[1]);
         System.out.println("Nb Pipelines:   "+values[2]);
         System.out.println("Nb Robots:      "+values[3]);
-        Factory f = new Factory(values[0], values[1], values[2], values[3]);
+        Factory f = new Factory(values[0], values[1], values[2], values[3], redirected);
 
         f.start();
     }

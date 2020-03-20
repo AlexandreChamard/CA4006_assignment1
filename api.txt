@@ -1,0 +1,25 @@
+
+[0, tickFrenquence, nbThread, nbPipeline, nbRobot] Start du program
+[1, nbParts]                restock
+[2, name, size]             new command
+[3, name, pipelineId]       aircraft assigned to pipeline
+[4, pipelineId, robotId]    add robot to pipeline
+[5, robotId, work]          robot gets work
+[6, robotId, 1 | 2 | 3 | 4] robot ( goes to storage | takes part on storage | goes to pipeline | has end its work)
+[7, pipelineId, 1 | 2 | 3]  pipeline ( advances aircraft | has end build | is closed)
+[8]                         factory closed
+
+Start
+restock
+new command
+aircraft assigned to pipeline
+add robot to pipeline
+robot gets work
+robot goes to storage
+robot takes part on storage
+robot goes to pipeline
+pipeline advance aircraft
+robot end its work
+pipeline end build
+pipeline close
+factory close

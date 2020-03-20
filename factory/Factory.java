@@ -24,6 +24,7 @@ public class Factory {
     private static ExecutorService  threadPool;
 
     private boolean                 _running;
+    private boolean                 _redirected;
     private Lock                    lock = new ReentrantLock(); // use to lock when robots are sent to pipelines
     private Queue<Aircraft>         aircrafts;
     private Pipeline[]              pipelines;
@@ -31,10 +32,11 @@ public class Factory {
     private Storage                 storage;
     private int                     linesRead = 0;
 
-    public Factory(int tickFrequence, int nbThreads, int nbPipelines, int nbRobots) {
+    public Factory(int tickFrequence, int nbThreads, int nbPipelines, int nbRobots, boolean _redirected) {
         if (tickFrequence <= 0 || nbThreads <= 0 || nbPipelines <= 0 || nbRobots <= 0) {
             throw new InternalError("Factory creation: invalid arguments.");
         }
+        this._redirected = _redirected;
         setFrequence(tickFrequence);
         if (threadPool == null) {
             threadPool = Executors.newFixedThreadPool(nbThreads);
@@ -55,6 +57,10 @@ public class Factory {
 
     public synchronized boolean running() {
         return _running;
+    }
+
+    public synchronized boolean redirected() {
+        return _redirected;
     }
 
     public void start() {
@@ -91,6 +97,7 @@ public class Factory {
             lock.lock();
             for (Robot r : robots) {
                 if (r.inPipeline() == false) {
+                    if (_redirected) System.out.println("[4,'"+p+"','"+r+"']");
                     System.out.println("add "+r+" to the "+p);
                     v.add(r);
                     r.goToPipeline(p);
@@ -206,14 +213,17 @@ public class Factory {
             if (p.working() == true) {
                 return;
             }
+            if (_redirected) System.out.println("[7,'"+p+"',3]");
             System.out.println(p+" has been closed.");
         }
+        if (_redirected) System.out.println("[8]");
         System.out.println("Factory has been closed.");
         threadPool.shutdown();
     }
 
     private synchronized void newCommand(String name, int nParts) {
         Aircraft aircraft = new Aircraft(name, nParts);
+        if (_redirected) System.out.println("[2,'"+aircraft+"',"+nParts+"]");
         System.out.println("new command for '"+name+"' with "+nParts+" part"+(nParts > 1 ? "s":"")+".");
 
         // find if at least one robot is available

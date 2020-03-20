@@ -1,0 +1,3 @@
+buy 5
+command A 5
+sleep 5
