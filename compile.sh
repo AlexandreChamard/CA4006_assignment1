@@ -1,5 +1,6 @@
 
 rm -f $(find . -name "*.class")
+gradlew build
 gradlew shadowJar
 cp build/libs/CA4006_assignment1-all.jar ./main.jar
 
