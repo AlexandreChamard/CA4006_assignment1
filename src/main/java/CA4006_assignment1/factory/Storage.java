@@ -38,6 +38,7 @@ public class Storage {
                     if (factory.running() == false) {
                         if (factory.redirected()) App.client.send("[8]");
                         System.out.println("Thread "+Thread.currentThread().getId()+": Due to covid-19, no new piece will arrive. The factory is forced to close.");
+                        App.close();
                         System.exit(42);
                     }
                     waitingList.add(robot);

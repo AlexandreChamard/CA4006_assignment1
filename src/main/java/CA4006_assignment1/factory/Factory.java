@@ -220,7 +220,11 @@ public class Factory {
         }
         if (_redirected) App.client.send("[8]");
         System.out.println("Factory has been closed.");
+
         threadPool.shutdown();
+
+        App.close();
+        System.exit(0);
     }
 
     private synchronized void newCommand(String name, int nParts) {

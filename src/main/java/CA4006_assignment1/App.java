@@ -11,75 +11,81 @@ import org.java_websocket.client.WebSocketClient;
 
 public class App {
     public static WebSocketClient client;
+    public static boolean redirected;
 
     public static void help() {
-            System.out.println("");
-            System.out.println("USAGE:");
-            System.out.println("\tjava Main [-f n] [-t n] [-p n] [-r n] [--redirected]");
-            System.out.println("");
-            System.out.println("-f --frequence: set the tick frequence (in ms) (n > 0).");
-            System.out.println("-t --threads  : set the number of threads (n > 0).");
-            System.out.println("-p --pipelines: set the number of pipelines (n > 0).");
-            System.out.println("-r --robots   : set the number of robots (n > 0).");
-            System.out.println("");
-            System.out.println("Read the input stream. Commands available:");
-            System.out.println("stop        : stop to the factory (close the input stream).");
-            System.out.println("buy n       : buy n aircraft parts (n > 0).");
-            System.out.println("command Id n: command an aircraft to the factory (Id is a string) (n > 0).");
-            System.out.println("sleep n     : sleep n ticks (n > 0) (useful for scripting).");
-            System.out.println("frequence n : modify the ticks frequence (n > 0).");
-            System.out.println("redirected  : print information for the graphical extension.");
-            System.out.println("");
-            System.exit(0);
-        }
+        System.out.println("");
+        System.out.println("USAGE:");
+        System.out.println("\tjava Main [-f n] [-t n] [-p n] [-r n] [--redirected]");
+        System.out.println("");
+        System.out.println("-f --frequence: set the tick frequence (in ms) (n > 0).");
+        System.out.println("-t --threads  : set the number of threads (n > 0).");
+        System.out.println("-p --pipelines: set the number of pipelines (n > 0).");
+        System.out.println("-r --robots   : set the number of robots (n > 0).");
+        System.out.println("");
+        System.out.println("Read the input stream. Commands available:");
+        System.out.println("stop        : stop to the factory (close the input stream).");
+        System.out.println("buy n       : buy n aircraft parts (n > 0).");
+        System.out.println("command Id n: command an aircraft to the factory (Id is a string) (n > 0).");
+        System.out.println("sleep n     : sleep n ticks (n > 0) (useful for scripting).");
+        System.out.println("frequence n : modify the ticks frequence (n > 0).");
+        System.out.println("redirected  : print information for the graphical extension.");
+        System.out.println("");
+        System.exit(0);
+    }
 
-        public static boolean parseArgs(String[] args, int[] values) {
-            boolean redirected = false;
-            int n = -1;
-            for (String a : args) {
-                if (n != -1) {
-                    try {
-                        int m = Integer.parseInt(a);
-                        if (m > 0) {
-                            values[n] = m;
-                        } else {
-                            System.out.println("failt to parse "+a+". default value was taken.");
-                        }
-                    } catch (NumberFormatException e) {
+    public static boolean parseArgs(String[] args, int[] values) {
+        boolean redirected = false;
+        int n = -1;
+        for (String a : args) {
+            if (n != -1) {
+                try {
+                    int m = Integer.parseInt(a);
+                    if (m > 0) {
+                        values[n] = m;
+                    } else {
                         System.out.println("failt to parse "+a+". default value was taken.");
                     }
-                    n = -1;
-                } else {
-                    switch (a) {
-                        case "-h": case "--help":
-                            help();
+                } catch (NumberFormatException e) {
+                    System.out.println("failt to parse "+a+". default value was taken.");
+                }
+                n = -1;
+            } else {
+                switch (a) {
+                    case "-h": case "--help":
+                        help();
 
-                        case "-f": case "--frequence":
-                            n = 0;
-                            break;
-                        case "-t": case "--threads":
-                            n = 1;
-                            break;
-                        case "-p": case "--pipelines":
-                            n = 2;
-                            break;
-                        case "-r": case "--robots":
-                            n = 3;
-                            break;
-                        case "--redirected":
-                            redirected = true;
-                            break;
-                        default:
-                            System.out.println("Invalid argument "+a);
-                    }
+                    case "-f": case "--frequence":
+                        n = 0;
+                        break;
+                    case "-t": case "--threads":
+                        n = 1;
+                        break;
+                    case "-p": case "--pipelines":
+                        n = 2;
+                        break;
+                    case "-r": case "--robots":
+                        n = 3;
+                        break;
+                    case "--redirected":
+                        redirected = true;
+                        break;
+                    default:
+                        System.out.println("Invalid argument "+a);
                 }
             }
-            if (n != -1) {
-                System.out.println("Missing number argument to "+args[args.length-1]+". Default value was taken.");
-            }
-            return redirected;
         }
+        if (n != -1) {
+            System.out.println("Missing number argument to "+args[args.length-1]+". Default value was taken.");
+        }
+        return redirected;
+    }
 
+    public static void close() {
+        if (redirected) {
+            client.close();
+        }
+    }
 
     public static void main(String[] args) throws URISyntaxException, InterruptedException {
         int[] values = {Factory.DEFAULT_TICK_FREQUENCE,
@@ -87,7 +93,7 @@ public class App {
                                 Factory.DEFAULT_NB_PIPELINES,
                                 Factory.DEFAULT_NB_ROBOTS};
 
-        boolean redirected = parseArgs(args, values);
+        redirected = parseArgs(args, values);
         if (redirected)  {
             client = new WsClient(new URI("ws://localhost:8000"));
             client.connectBlocking();
@@ -100,9 +106,5 @@ public class App {
         Factory f = new Factory(values[0], values[1], values[2], values[3], redirected);
 
         f.start();
-        if (redirected) {
-            client.close();
-        }
-        System.exit(0);
     }
 }
