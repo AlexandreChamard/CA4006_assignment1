@@ -34,6 +34,8 @@ function App() {
                     setNbThread(data[2]);
                     setNbPipeline(data[3]);
                     setNbRobot(data[4]);
+                    setStock(0);
+                    setAircraft([]);
                     const newPipelines = [];
                     for (let i = 0; i < data[3]; i++)
                         newPipelines.push({ id: i + 1, status: 'OPEN' });
