@@ -1,6 +1,8 @@
 
 package factory;
 
+import CA4006_assignment1.App;
+
 import java.lang.InternalError;
 import java.util.ArrayDeque;
 import java.util.Queue;
@@ -23,7 +25,7 @@ public class Storage {
             throw new InternalError("Storage: addParts must get an positive integer as argument.");
         }
         parts += n;
-        if (factory.redirected()) System.out.println("[1,"+n+","+parts+"]");
+        if (factory.redirected()) App.client.send("[1,"+n+","+parts+"]");
         System.out.println("Restock "+n+" ("+parts+")");
         clearQueue();
     }
@@ -34,7 +36,7 @@ public class Storage {
                 if (parts == 0) {
                     System.out.println("Thread "+Thread.currentThread().getId()+": "+robot+" storage is empty. Wait for new pieces...");
                     if (factory.running() == false) {
-                        if (factory.redirected()) System.out.println("[8]");
+                        if (factory.redirected()) App.client.send("[8]");
                         System.out.println("Thread "+Thread.currentThread().getId()+": Due to covid-19, no new piece will arrive. The factory is forced to close.");
                         System.exit(42);
                     }

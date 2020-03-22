@@ -1,6 +1,8 @@
 
 package factory;
 
+import CA4006_assignment1.App;
+
 import java.lang.InternalError;
 import java.util.Random;
 
@@ -66,7 +68,7 @@ public class Robot {
             if (state != State.STORAGE) {
                 throw new InternalError(this+": Invalid state on takePart.");
             }
-            if (factory.redirected()) System.out.println("[6,'"+this+"',1]");
+            if (factory.redirected()) App.client.send("[6,\""+this+"\",1]");
             System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" goes to storage.");
             try { Thread.sleep(2 * factory.getFrequence()); } catch (InterruptedException e) {}
             factory.getStorage().getPart(this);
@@ -79,7 +81,7 @@ public class Robot {
                 if (nParts != 0) {
                     holding = true;
                     changeState(State.STORAGE, State.ACTIVE, "hasPart");
-                    if (factory.redirected()) System.out.println("[6,'"+this+"',2]");
+                    if (factory.redirected()) App.client.send("[6,\""+this+"\",2]");
                     System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" takes its part on storage.");
                     pipeline.placeRobot(this);
                 } else {
@@ -122,7 +124,7 @@ public class Robot {
         if (holding == true) {
             nParts = 1;
         }
-        if (factory.redirected()) System.out.println("[5,'"+this+"',"+nParts+"]");
+        if (factory.redirected()) App.client.send("[5,\""+this+"\","+nParts+"]");
         System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" has now "+nParts+" parts to place on "+pipeline+".");
     }
 
@@ -132,7 +134,7 @@ public class Robot {
     }
 
     private synchronized void resetState() {
-        if (factory.redirected()) System.out.println("[6,'"+this+"',4]");
+        if (factory.redirected()) App.client.send("[6,\""+this+"\",4]");
         System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" has end its work.");
         if (holding == true) {
             factory.getStorage().addParts(1);

@@ -1,12 +1,14 @@
 
 package factory;
 
+import CA4006_assignment1.App;
+
 import java.io.*;
 import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors; 
+import java.util.concurrent.Executors;
 import java.util.concurrent.locks.*;
 
 import factory.Pipeline;
@@ -72,7 +74,7 @@ public class Factory {
             robots[i] = new Robot(this);
         }
 
-        BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));  
+        BufferedReader obj = new BufferedReader(new InputStreamReader(System.in));
         String str;
         try {
             do {
@@ -97,7 +99,7 @@ public class Factory {
             lock.lock();
             for (Robot r : robots) {
                 if (r.inPipeline() == false) {
-                    if (_redirected) System.out.println("[4,'"+p+"','"+r+"']");
+                    if (_redirected) App.client.send("[4,\""+p+"\",\""+r+"\"]");
                     System.out.println("add "+r+" to the "+p);
                     v.add(r);
                     r.goToPipeline(p);
@@ -213,17 +215,17 @@ public class Factory {
             if (p.working() == true) {
                 return;
             }
-            if (_redirected) System.out.println("[7,'"+p+"',3]");
+            if (_redirected) App.client.send("[7,\""+p+"\",3]");
             System.out.println(p+" has been closed.");
         }
-        if (_redirected) System.out.println("[8]");
+        if (_redirected) App.client.send("[8]");
         System.out.println("Factory has been closed.");
         threadPool.shutdown();
     }
 
     private synchronized void newCommand(String name, int nParts) {
         Aircraft aircraft = new Aircraft(name, nParts);
-        if (_redirected) System.out.println("[2,'"+aircraft+"',"+nParts+"]");
+        if (_redirected) App.client.send("[2,\""+aircraft+"\","+nParts+"]");
         System.out.println("new command for '"+name+"' with "+nParts+" part"+(nParts > 1 ? "s":"")+".");
 
         // find if at least one robot is available
