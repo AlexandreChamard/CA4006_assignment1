@@ -110,15 +110,21 @@ function App() {
                 }
                 if (data[0] === 7) {
                     if (data[2] === 1) {
-                        const newAircrafts = aircraft.map((a) =>
-                                a.pipelineId === data[1] ? {...a, done: a.done+1} : a
-                        );
+                        const newAircrafts = aircraft.map((a) => {
+                            if (a.pipelineId === data[1])
+                                a.done += 1;
+                            return a;
+                        });
                         setAircraft(newAircrafts);
                     }
                     if (data[2] === 2) {
-                        const newAircraft = aircraft.map((a) =>
-                                a.pipelineId === data[1] ? {...a, done: a.size} : a
-                        );
+                        const newAircraft = aircraft.map((a) => {
+                            if (a.pipelineId === data[1]) {
+                                a.done = a.size;
+                                a.pipelineId = 0;
+                            }
+                            return a;
+                        });
                         setAircraft(newAircraft);
                     }
                 }
@@ -163,7 +169,15 @@ function App() {
                             <br/>
                             {aircraft.map((a, k) =>
                                     <div className="aircraft" key={'aircraft'+k}>
-                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}</div>
+                                        {a.done === a.size &&
+                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.size} parts is built.</div>
+                                        }
+                                        {a.pipelineId !== 0 &&
+                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}.</div>
+                                        }
+                                        {a.pipelineId === 0 && a.done !== a.size &&
+                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is waiting.</div>
+                                        }
                                         <ProgressBar completed={a.done * 100 / a.size} />
                                     </div>
                             )}
