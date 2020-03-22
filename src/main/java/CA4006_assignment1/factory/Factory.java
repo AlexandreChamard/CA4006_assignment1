@@ -227,25 +227,30 @@ public class Factory {
         System.exit(0);
     }
 
-    private synchronized void newCommand(String name, int nParts) {
+    private void newCommand(String name, int nParts) {
         Aircraft aircraft = new Aircraft(name, nParts);
         if (_redirected) App.client.send("[2,\""+aircraft+"\","+nParts+"]");
         System.out.println("new command for '"+name+"' with "+nParts+" part"+(nParts > 1 ? "s":"")+".");
 
         // find if at least one robot is available
+        lock.lock();
         for (Robot r : robots) {
             if (r.inPipeline() == false) {
                 // find an available pipeline
                 for (Pipeline p : pipelines) {
                     if (p.working() == false) {
                         p.buildAircraft(aircraft);
+                        lock.unlock();
                         return;
                     }
                 }
                 break;
             }
         }
+        lock.unlock();
         // if neither a robot nor a pipeline is available, put the command in the waiting list
-        aircrafts.add(aircraft);
+        synchronized (this) {
+            aircrafts.add(aircraft);
+        }
     }
 }
