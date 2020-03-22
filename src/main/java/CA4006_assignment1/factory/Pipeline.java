@@ -35,7 +35,7 @@ public class Pipeline {
         if (this.aircraft != null) {
             throw new InternalError(this+": there is already an aircraft to build.");
         }
-        if (factory.redirected()) App.client.send("[8,\""+aircraft+"\",\""+this+"\"]");
+        if (factory.redirected()) App.client.send("[3,\""+aircraft+"\",\""+this+"\"]");
         System.out.println("Thread "+Thread.currentThread().getId()+": "+this+" starts to build "+aircraft);
         this.aircraft = aircraft;
         factory.givesRobots(this, aircraft.missingWork());
