@@ -1,5 +1,5 @@
 
 rm -f $(find . -name "*.class")
-java -jar main.jar
+java -jar factory.jar
 
-echo -e "USAGE:\n\tjava Main --help"
+echo -e "USAGE:\n\tjava -jar factory.jar --help"
