@@ -17,6 +17,7 @@ function App() {
     const [stock, setStock] = useState(0);
     const [aircraft, setAircraft] = useState([]);
     const [robot, setRobot] = useState([]);
+    const [done, setDone] = useState(false);
 
     useEffect(() => {
 
@@ -57,20 +58,6 @@ function App() {
                     });
                     setAircraft(newAircrafts);
                 }
-                if (data[0] === 7 && (data[2] === 2 || data[2] === 3)) {
-                    const newPipelines = pipeline.map((p) => {
-                        if (p.id === data[1]) {
-                            if (data[2] === 2)
-                                p.status = 'ENDED';
-                            if (data[2] === 3)
-                                p.status = 'CLOSED';
-                            if (data[2] === 1)
-                                p.status = 'OPEN';
-                        }
-                        return p;
-                    });
-                    setPipeline(newPipelines);
-                }
                 if (data[0] === 4) {
                     const newRobots = robot.map((r) => {
                         if (r.name === data[2])
@@ -109,6 +96,20 @@ function App() {
                     setRobot(newRobots);
                 }
                 if (data[0] === 7) {
+                    const newPipelines = pipeline.map((p) => {
+                        if (data[1] === `Pipeline ${p.id}`) {
+                            if (data[2] === 2)
+                                p.status = 'ENDED';
+                            if (data[2] === 3)
+                                p.status = 'CLOSED';
+                            if (data[2] === 1)
+                                p.status = 'OPEN';
+                        }
+                        return p;
+                    });
+                    setPipeline(newPipelines);
+                }
+                if (data[0] === 7) {
                     if (data[2] === 1) {
                         const newAircrafts = aircraft.map((a) => {
                             if (a.pipelineId === data[1])
@@ -127,6 +128,9 @@ function App() {
                         });
                         setAircraft(newAircraft);
                     }
+                }
+                if (data[0] === 8) {
+                    setDone(true);
                 }
             } catch (e) {
                 console.error(e.message);
@@ -155,6 +159,7 @@ function App() {
                             Number of robot: {nbRobot}<br/>
                             Stock: {stock} <br/>
                             <br/>
+                            {done && <div style={{display: 'flex', justifyContent: 'center'}}>The factory has ended, it's close !</div>}
                             {pipeline.map((p, j) =>
                                     <div style={{display: 'flex', justifyContent: 'center'}} key={'pipeline'+j}>
                                         The pipeline {p.id} is {p.status}
