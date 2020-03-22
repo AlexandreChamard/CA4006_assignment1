@@ -4,6 +4,7 @@ import Loading from './components/Loading';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
 import ProgressBar from './components/ProgressBar';
 import Container from '@material-ui/core/Container';
+import Typography from '@material-ui/core/Typography';
 
 const client = new W3CWebSocket('ws://127.0.0.1:8000');
 
@@ -31,6 +32,7 @@ function App() {
                 const data = JSON.parse(message.data);
                 console.log('message', data);
                 if (data[0] === 0) {
+                    setDone(false);
                     setTickFrenquence(data[1]);
                     setNbThread(data[2]);
                     setNbPipeline(data[3]);
@@ -152,36 +154,42 @@ function App() {
                 {isLoading && <Loading />}
                 {!isLoading &&
                     <div>
-                        <Container component="main" maxWidth="md" style={{ paddingTop: '100px' }}>
-                            Tick frequency: {tickFrenquence}<br/>
-                            Number of thread: {nbThread}<br/>
-                            Number of pipeline: {nbPipeline}<br/>
-                            Number of robot: {nbRobot}<br/>
-                            Stock: {stock} <br/>
+                        <Container component="main" maxWidth="md" style={{ paddingTop: '50px' }}>
+                            <Typography variant="subtitle1" component="body1">Tick frequency: {tickFrenquence}</Typography>
                             <br/>
-                            {done && <div style={{display: 'flex', justifyContent: 'center'}}>The factory has ended, it's close !</div>}
+                            <Typography variant="subtitle1" component="body1">Number of thread: {nbThread}</Typography>
+                            <br/>
+                            <Typography variant="subtitle1" component="body1">Number of pipeline: {nbPipeline}</Typography>
+                            <br/>
+                            <Typography variant="subtitle1" component="body1">Number of robot: {nbRobot}</Typography>
+                            <br/>
+                            <Typography variant="subtitle1" component="body1">Stock: {stock}</Typography>
+                            <br/>
+                            {done && <Typography variant="h6" component="body1" style={{display: 'flex', justifyContent: 'center'}}>The factory has ended, it's close !</Typography>}
                             {pipeline.map((p, j) =>
-                                    <div style={{display: 'flex', justifyContent: 'center'}} key={'pipeline'+j}>
+                                    <Typography variant="subtitle1" component="body1" style={{display: 'flex', justifyContent: 'center'}} key={'pipeline'+j}>
                                         The pipeline {p.id} is {p.status}
-                                    </div>
+                                    </Typography>
                             )}
                             <br/>
                             {robot.map((r, i) =>
-                                    <div className="robot" key={'robot-'+i}>
-                                        {r.name} with {r.todo || '0'} work left to do {r.status}
+                                    <div>
+                                        <Typography variant="subtitle1" component="body1" className="robot" key={'robot-'+i}>
+                                            {r.name} with {r.todo || '0'} work left to do {r.status}
+                                        </Typography><br/>
                                     </div>
                             )}
                             <br/>
                             {aircraft.map((a, k) =>
                                     <div className="aircraft" key={'aircraft'+k}>
                                         {a.done === a.size &&
-                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.size} parts is built.</div>
+                                        <Typography variant="subtitle1" component="body1" style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.size} parts is built.</Typography>
                                         }
                                         {a.pipelineId !== 0 &&
-                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}.</div>
+                                        <Typography variant="subtitle1" component="body1" style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}.</Typography>
                                         }
                                         {a.pipelineId === 0 && a.done !== a.size &&
-                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is waiting.</div>
+                                        <Typography variant="subtitle1" component="body1" style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is waiting.</Typography>
                                         }
                                         <ProgressBar completed={a.done * 100 / a.size} />
                                     </div>

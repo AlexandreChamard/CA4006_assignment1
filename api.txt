@@ -1,6 +1,6 @@
 
 [0, tickFrenquence, nbThread, nbPipeline, nbRobot] Start du program
-[1, nbParts]                restock
+[1, n, nbParts]             restock
 [2, name, size]             new command
 [3, name, pipelineId]       aircraft assigned to pipeline
 [4, pipelineId, robotId]    add robot to pipeline
