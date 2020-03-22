@@ -1,5 +1,6 @@
 
 rm -f $(find . -name "*.class")
-javac Main.java
+gradlew shadowJar
+cp build/libs/CA4006_assignment1-all.jar ./main.jar
 
-echo -e "USAGE:\n\tjava Main --help"
+echo -e "USAGE:\n\tjava -jar main.jar --help"
