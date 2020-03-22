@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Loading from './components/Loading';
 import { w3cwebsocket as W3CWebSocket } from "websocket";
+import ProgressBar from './components/ProgressBar';
+import Container from '@material-ui/core/Container';
 
 const client = new W3CWebSocket('ws://127.0.0.1:8000');
 
@@ -134,32 +137,35 @@ function App() {
 
     return (
             <div className="App">
-                {isLoading && <div>Loading...</div>}
+                {isLoading && <Loading />}
                 {!isLoading &&
                     <div>
-                        Tick frequency: {tickFrenquence}<br/>
-                        Number of thread: {nbThread}<br/>
-                        Number of pipeline: {nbPipeline}<br/>
-                        Number of robot: {nbRobot}<br/>
-                        Stock: {stock} <br/>
-                        <br/>
-                        {pipeline.map((p, j) =>
-                                <div className="pipeline" key={'pipeline'+j}>
-                                    The pipeline {p.id} is {p.status}
-                                </div>
-                        )}
-                        <br/>
-                        {robot.map((r, i) =>
-                                <div className="robot" key={'robot-'+i}>
-                                     {r.name} with {r.todo || '0'} work left to do {r.status}
-                                </div>
-                        )}
-                        <br/>
-                        {aircraft.map((a, k) =>
-                                <div className="aircraft" key={'aircraft'+k}>
-                                    The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}
-                                </div>
-                        )}
+                        <Container component="main" maxWidth="md" style={{ paddingTop: '100px' }}>
+                            Tick frequency: {tickFrenquence}<br/>
+                            Number of thread: {nbThread}<br/>
+                            Number of pipeline: {nbPipeline}<br/>
+                            Number of robot: {nbRobot}<br/>
+                            Stock: {stock} <br/>
+                            <br/>
+                            {pipeline.map((p, j) =>
+                                    <div style={{display: 'flex', justifyContent: 'center'}} key={'pipeline'+j}>
+                                        The pipeline {p.id} is {p.status}
+                                    </div>
+                            )}
+                            <br/>
+                            {robot.map((r, i) =>
+                                    <div className="robot" key={'robot-'+i}>
+                                        {r.name} with {r.todo || '0'} work left to do {r.status}
+                                    </div>
+                            )}
+                            <br/>
+                            {aircraft.map((a, k) =>
+                                    <div className="aircraft" key={'aircraft'+k}>
+                                        <div style={{display: 'flex', justifyContent: 'center'}}>The {a.name} of {a.done}/{a.size} parts is on the {a.pipelineId}</div>
+                                        <ProgressBar completed={a.done * 100 / a.size} />
+                                    </div>
+                            )}
+                        </Container>
                     </div>
                 }
             </div>
